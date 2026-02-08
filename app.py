@@ -28,35 +28,53 @@ def whatsapp_reply():
     print(f"📱 DE: {sender} | MENSAGEM: {msg}")
     
     # SUAS REGRAS PERSONALIZADAS
-    if 'oi' in msg or 'olá' in msg or 'ola' in msg or 'Bom dia' in msg:
+    if 'oi' in msg or 'olá' in msg or 'ola' in msg:
         resposta = "E aí! Tudo bem? Como posso ajudar? 😊"
     
     elif 'tudo bem' in msg:
         resposta = "Tudo ótimo por aqui! E com você?"
+    
+    elif 'horas' in msg or 'hora' in msg:
+        from datetime import datetime
+        hora = datetime.now().strftime("%H:%M")
+        resposta = f"Agora são {hora} ⏰"
+    
+    elif 'nome' in msg:
+        resposta = "Sou seu assistente pessoal! Pode me chamar de Bot 😄"
+    
+    elif 'ajuda' in msg or 'comandos' in msg:
+        resposta = "Posso responder sobre: horas, data, ou conversar normalmente!"
+    
     else:
-        # Usa IA
+        # Se não cair nas regras, usa IA (OpenAI)
         try:
-            completion = openai.ChatCompletion.create(
+            # Adicione SEU estilo aqui
+            prompt = f"""
+            Você é um assistente pessoal brasileiro. 
+            Fale casual, use emojis, seja breve.
+            Responda como se fosse um amigo.
+            
+            Mensagem: {msg}
+            Resposta:"""
+            
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
-                    {"role": "system", "content": SEU_PERFIL},
+                    {"role": "system", "content": "Você é um amigo brasileiro, casual, usa emojis."},
                     {"role": "user", "content": msg}
                 ],
-                max_tokens=150,
-                temperature=0.7
+                max_tokens=150
             )
-            resposta = completion.choices[0].message.content
-        except:
-            resposta = "Deu ruim aqui, tenta de novo mais tarde 😅"
-
-    # Responde via Twilio
+            resposta = response.choices[0].message.content
+            
+        except Exception as e:
+            print(f"Erro OpenAI: {e}")
+            resposta = "Estou aprendendo ainda! Pode reformular? 😅"
+    
+    # LOG da resposta
+    print(f"🤖 RESPOSTA: {resposta}")
+    
+    # Envia resposta
     resp = MessagingResponse()
     resp.message(resposta)
     return str(resp)
-
-@app.route('/')
-def home():
-    return "Bot WhatsApp está rodando!"
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
