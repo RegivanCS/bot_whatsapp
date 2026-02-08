@@ -1,4 +1,33 @@
-*
+cd ..
+mkdir bot_whatsapp_clean
+cd bot_whatsapp_clean
 
-.env 
+# Copie seus arquivos, EXCETO .env
+Copy-Item "C:\Users\regiv\meu_bot_whatsapp\app.py" .
+Copy-Item "C:\Users\regiv\meu_bot_whatsapp\requirements.txt" .
 
+# Crie .gitignore primeiro
+@"
+.env
+venv/
+__pycache__/
+*.pyc
+"@ | Out-File -FilePath .gitignore -Encoding UTF8
+
+# Crie .env local (NÃO COMITE!)
+@"
+OPENAI_API_KEY=sk-sua-chave-aqui
+ACCOUNT_SID=AC-sua-sid-twilio
+AUTH_TOKEN=seu-auth-token-twilio
+"@ | Out-File -FilePath .env -Encoding UTF8
+
+# Configure Git
+git init
+git add .
+git commit -m "Initial commit without secrets"
+
+# Conecte a um NOVO repositório no GitHub
+# Vá em github.com → New repository (ex: bot-whatsapp-clean)
+git remote add origin https://github.com/SEU_USUARIO/bot-whatsapp-clean.git
+git branch -M main
+git push -u origin main
