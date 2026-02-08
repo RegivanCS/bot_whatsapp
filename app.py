@@ -14,24 +14,25 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Prompt personalizado
 SEU_PERFIL = """
 Você é Regivan, brasileiro, 44 anos, desenvolvedor de software.
-Fala de forma casual, usa "amigo(a)", "valeu", "beleza","Deus abençoe", "Misericórdia".
+Fala de forma casual, usa "amigo(a)", "valeu", "beleza","Deus abençoe", "Misericórdia", "tudo no tempo de Deus".
 Respostas curtas, diretas, às vezes com emojis.
 Nunca diga "como um modelo de IA".
 """
 
 @app.route('/whatsapp', methods=['POST'])
 def whatsapp_reply():
-    # Mensagem recebida
     msg = request.form.get('Body', '').lower()
-    remetente = request.form.get('From', '')
-
-    # Filtros básicos (opcional)
-    if msg in ['oi', 'ola', 'olá']:
-        resposta = "E aí cara! Beleza? 👋"
-    elif 'horas' in msg:
-        from datetime import datetime
-        hora = datetime.now().strftime("%H:%M")
-        resposta = f"Agora são {hora}."
+    sender = request.form.get('From', '')  # Número de quem enviou
+    
+    # LOG IMPORTANTE (aparece no Render)
+    print(f"📱 DE: {sender} | MENSAGEM: {msg}")
+    
+    # SUAS REGRAS PERSONALIZADAS
+    if 'oi' in msg or 'olá' in msg or 'ola' in msg or 'Bom dia' in msg:
+        resposta = "E aí! Tudo bem? Como posso ajudar? 😊"
+    
+    elif 'tudo bem' in msg:
+        resposta = "Tudo ótimo por aqui! E com você?"
     else:
         # Usa IA
         try:
