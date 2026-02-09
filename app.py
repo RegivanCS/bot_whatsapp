@@ -3,10 +3,14 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 import openai
+from datetime import datetime
 
 load_dotenv()
 
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return "Bot WhatsApp está rodando! ✅"
 
 # Configure OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -23,6 +27,14 @@ Nunca diga "como um modelo de IA".
 def whatsapp_reply():
     msg = request.form.get('Body', '').lower()
     sender = request.form.get('From', '')  # Número de quem enviou
+
+      # LOG DETALHADO - aparece no Render
+    print("\n" + "="*50)
+    print(f"📱 NOVA MENSAGEM RECEBIDA")
+    print(f"⏰ Hora: {datetime.now()}")
+    print(f"👤 De: {request.form.get('From')}")
+    print(f"💬 Texto: {request.form.get('Body')}")
+    print("="*50 + "\n")
     
     # LOG IMPORTANTE (aparece no Render)
     print(f"📱 DE: {sender} | MENSAGEM: {msg}")
@@ -40,7 +52,7 @@ def whatsapp_reply():
         resposta = f"Agora são {hora} ⏰"
     
     elif 'nome' in msg:
-        resposta = "Sou seu assistente pessoal! Pode me chamar de Bot 😄"
+        resposta = "Sou seu assistente pessoal! Pode me chamar de Dev_An 😄"
     
     elif 'ajuda' in msg or 'comandos' in msg:
         resposta = "Posso responder sobre: horas, data, ou conversar normalmente!"
@@ -50,7 +62,7 @@ def whatsapp_reply():
         try:
             # Adicione SEU estilo aqui
             prompt = f"""
-            Você é um assistente pessoal brasileiro. 
+            Você é um assistente pessoal brasileiro, seu nome é Dev_An. 
             Fale casual, use emojis, seja breve.
             Responda como se fosse um amigo.
             
@@ -69,7 +81,7 @@ def whatsapp_reply():
             
         except Exception as e:
             print(f"Erro OpenAI: {e}")
-            resposta = "Estou aprendendo ainda! Pode reformular? 😅"
+            resposta = "Estou aprendendo ainda! Pode reformular a pergunta? 😅"
     
     # LOG da resposta
     print(f"🤖 RESPOSTA: {resposta}")
